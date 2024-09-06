@@ -1,0 +1,5 @@
+﻿using System.Text.Json.Serialization;
+
+namespace Taverna.Wrappers.Spotify;
+
+public record SpotifyAlbum( [property: JsonPropertyName( "album_type" )] string? AlbumType , [property: JsonPropertyName( "total_tracks" )] int? TotalTracks , [property: JsonPropertyName( "available_markets" )] List<string>? AvailableMarkets , [property: JsonPropertyName( "external_urls" )] SpotifyExternalUrls? ExternalUrls , [property: JsonPropertyName( "href" )] string? Href , [property: JsonPropertyName( "id" )] string? Id , [property: JsonPropertyName( "images" )] List<SpotifyImage>? Images , [property: JsonPropertyName( "name" )] string? Name , [property: JsonPropertyName( "release_date" )] string? ReleaseDate , [property: JsonPropertyName( "release_date_precision" )] string? ReleaseDatePrecision , [property: JsonPropertyName( "restrictions" )] SpotifyRestrictions? Restrictions , [property: JsonPropertyName( "type" )] string? Type , [property: JsonPropertyName( "uri" )] string? Uri , [property: JsonPropertyName( "artists" )] List<SpotifyArtist>? Artists );
