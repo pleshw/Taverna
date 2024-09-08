@@ -141,44 +141,6 @@ public static class SpotifyAPI
         return null;
     }
 
-
-
-    public static async Task<SpotifyRequestTokenReponse?> RequestUserAuthorizationAsync( HttpClient httpClient )
-    {
-        string GenerateRandomString( int length , string charSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrschar[]?char[]?char[]?char[]?char[]?wxyz0123456789" )
-        {
-            var charArray = charSet.Distinct().ToArray();
-            char[] result = new char[length];
-            for (int i = 0; i < length; i++)
-                result[i] = charArray[RandomNumberGenerator.GetInt32( charArray.Length )];
-            return new string( result );
-        }
-
-        Dictionary<string , string> parameters = new()
-        {
-            {"response_type", "code" },
-            {"client_id", "2a581139f71642bebb60f0a2f2540137" },
-            {"client_secret", "af3adfc58555408cb8af716a63365f71" },
-            {"redirect_uri", "https://localhost:7218/challenge-spotify" },
-            {"state", GenerateRandomString(16) },
-            {"scope", "ugc-image-upload user-read-playback-state user-modify-playback-state user-read-currently-playing app-remote-control streaming playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-follow-modify user-follow-read user-read-playback-position user-top-read user-read-recently-played user-library-modify user-library-read user-read-email user-read-private" }
-        };
-
-        HttpRequestMessage request = new( SpotifyRequestURI.RequestAccessToken.Method , SpotifyRequestURI.RequestAccessToken.URL );
-        request.Headers.Add( "Accept" , "application/json" );
-        request.Content = new FormUrlEncodedContent( parameters );
-
-        HttpResponseMessage response = await httpClient.SendAsync( request );
-        string spotifyRequestResult = await response.Content.ReadAsStringAsync();
-
-        if (response.IsSuccessStatusCode && !string.IsNullOrEmpty( spotifyRequestResult ))
-        {
-            return JsonSerializer.Deserialize<SpotifyRequestTokenReponse>( spotifyRequestResult );
-        }
-
-        return null;
-    }
-
     public static void SetQueryParameters(HttpRequestMessage request, HttpMethod httpMethod, JsonDocument parameters)
     {
         if (httpMethod == HttpMethod.Get)
