@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taverna", "Taverna\Taverna\Taverna.csproj", "{B042D5D7-B989-4FFB-934C-F9B8E1938F05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taverna", "Taverna\Taverna\Taverna.csproj", "{B042D5D7-B989-4FFB-934C-F9B8E1938F05}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taverna.Client", "Taverna\Taverna.Client\Taverna.Client.csproj", "{36EE478C-6942-4737-B98C-0D788756869E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taverna.Client", "Taverna\Taverna.Client\Taverna.Client.csproj", "{36EE478C-6942-4737-B98C-0D788756869E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taverna.Tests", "Taverna.Tests\Taverna.Tests.csproj", "{3BC1B64D-8217-4E48-A02F-752466A42230}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taverna.Tests", "Taverna.Tests\Taverna.Tests.csproj", "{3BC1B64D-8217-4E48-A02F-752466A42230}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

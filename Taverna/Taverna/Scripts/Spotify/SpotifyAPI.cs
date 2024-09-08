@@ -1,8 +1,10 @@
 ﻿using System.Net.Http.Headers;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Taverna.Wrappers.Spotify;
+using static Taverna.Wrappers.Spotify.SpotifyResponseTypes;
 
 namespace Taverna.Scripts.Spotify;
 
@@ -19,7 +21,7 @@ public static class SpotifyAPI
         return currentState != null && currentState?.Device?.Name == deviceName && currentState.IsPlaying();
     }
 
-    public static async Task<SpotifyUser?> GetSpotifyUser(this HttpClient client, string accessToken)
+    public static async Task<SpotifyUser?> GetSpotifyCurrentUser(this HttpClient client, string accessToken)
     {
         return await Request<SpotifyUser>(
                 accessToken,
@@ -33,6 +35,14 @@ public static class SpotifyAPI
                 accessToken,
                 SpotifyRequestURI.GetPlayerPlaybackState,
                 client);
+    }
+
+    public static async Task<SpotifyDevice?> GetUserDevices( this HttpClient client , string accessToken )
+    {
+        return await Request<SpotifyDevice>(
+                accessToken ,
+                SpotifyRequestURI.GetDevices,
+                client );
     }
 
     public static async Task<SpotifyTrack?> GetSpotifyTrack(this HttpClient client, string accessToken, string trackId)
@@ -56,7 +66,7 @@ public static class SpotifyAPI
                 accessToken,
                 SpotifyRequestURI.TransferPlayback,
                 client,
-                Parse(new SpotifyResponseTypes.SetPlayerCurrentPlayback( [deviceId] , false))
+                Parse(new SetPlayerCurrentPlayback( [deviceId] , false))
                 );
     }
 
@@ -66,7 +76,7 @@ public static class SpotifyAPI
                 accessToken,
                 SpotifyRequestURI.TransferPlayback,
                 client,
-                Parse(new SpotifyResponseTypes.SetPlayerCurrentPlayback( [deviceId], true ))
+                Parse(new SetPlayerCurrentPlayback( [deviceId], true ))
                 );
     }
 
@@ -102,6 +112,73 @@ public static class SpotifyAPI
         return null;
     }
 
+    public static async Task<SpotifyRequestTokenReponse?> RequestAccessTokenAsync()
+    {
+        return await RequestTokenAsync(new HttpClient());
+    }
+
+    public static async Task<SpotifyRequestTokenReponse?> RequestTokenAsync( HttpClient httpClient )
+    {
+        Dictionary<string , string> parameters = new()
+        {
+            {"grant_type", "client_credentials" },
+            {"client_id", "2a581139f71642bebb60f0a2f2540137" },
+            {"client_secret", "af3adfc58555408cb8af716a63365f71" }
+        };
+
+        HttpRequestMessage request = new( SpotifyRequestURI.RequestAccessToken.Method , SpotifyRequestURI.RequestAccessToken.URL );
+        request.Headers.Add( "Accept" , "application/json" );
+        request.Content = new FormUrlEncodedContent( parameters );
+
+        HttpResponseMessage response = await httpClient.SendAsync( request );
+        string spotifyRequestResult = await response.Content.ReadAsStringAsync();
+
+        if (response.IsSuccessStatusCode && !string.IsNullOrEmpty( spotifyRequestResult ))
+        {
+            return JsonSerializer.Deserialize<SpotifyRequestTokenReponse>( spotifyRequestResult );
+        }
+
+        return null;
+    }
+
+
+
+    public static async Task<SpotifyRequestTokenReponse?> RequestUserAuthorizationAsync( HttpClient httpClient )
+    {
+        string GenerateRandomString( int length , string charSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrschar[]?char[]?char[]?char[]?char[]?wxyz0123456789" )
+        {
+            var charArray = charSet.Distinct().ToArray();
+            char[] result = new char[length];
+            for (int i = 0; i < length; i++)
+                result[i] = charArray[RandomNumberGenerator.GetInt32( charArray.Length )];
+            return new string( result );
+        }
+
+        Dictionary<string , string> parameters = new()
+        {
+            {"response_type", "code" },
+            {"client_id", "2a581139f71642bebb60f0a2f2540137" },
+            {"client_secret", "af3adfc58555408cb8af716a63365f71" },
+            {"redirect_uri", "https://localhost:7218/challenge-spotify" },
+            {"state", GenerateRandomString(16) },
+            {"scope", "ugc-image-upload user-read-playback-state user-modify-playback-state user-read-currently-playing app-remote-control streaming playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-follow-modify user-follow-read user-read-playback-position user-top-read user-read-recently-played user-library-modify user-library-read user-read-email user-read-private" }
+        };
+
+        HttpRequestMessage request = new( SpotifyRequestURI.RequestAccessToken.Method , SpotifyRequestURI.RequestAccessToken.URL );
+        request.Headers.Add( "Accept" , "application/json" );
+        request.Content = new FormUrlEncodedContent( parameters );
+
+        HttpResponseMessage response = await httpClient.SendAsync( request );
+        string spotifyRequestResult = await response.Content.ReadAsStringAsync();
+
+        if (response.IsSuccessStatusCode && !string.IsNullOrEmpty( spotifyRequestResult ))
+        {
+            return JsonSerializer.Deserialize<SpotifyRequestTokenReponse>( spotifyRequestResult );
+        }
+
+        return null;
+    }
+
     public static void SetQueryParameters(HttpRequestMessage request, HttpMethod httpMethod, JsonDocument parameters)
     {
         if (httpMethod == HttpMethod.Get)
@@ -127,6 +204,11 @@ public static class SpotifyAPI
         }
     }
 
+    /// <summary>
+    /// Makes an object of any class A JsonLikeStructure
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public static JsonDocument Parse(object item)
     {
         return JsonDocument.Parse(JsonSerializer.Serialize(item, _JSONParseOptions));

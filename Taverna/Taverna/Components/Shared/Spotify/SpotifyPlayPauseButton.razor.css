@@ -1,0 +1,24 @@
+﻿
+.playing-state-button {
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	-webkit-box-pack: center;
+	-ms-flex-pack: center;
+	align-items: center;
+	background-color: #fff;
+	border: none;
+	border-radius: 32px;
+	color: #000;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	height: 32px;
+	justify-content: center;
+	min-width: 32px;
+	position: relative;
+	-webkit-transition: none 33ms cubic-bezier(.3,0,.7,1);
+	transition: none 33ms cubic-bezier(.3,0,.7,1);
+	-webkit-transition-property: all;
+	transition-property: all;
+	width: 32px;
+}

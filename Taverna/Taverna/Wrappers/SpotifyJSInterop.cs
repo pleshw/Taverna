@@ -2,7 +2,7 @@
 
 namespace Taverna.Wrappers;
 
-public class SpotifyJSInterop : IDisposable
+public class SpotifyJSInterop 
 {
     public SpotifyJSInterop()
     {
@@ -29,10 +29,5 @@ public class SpotifyJSInterop : IDisposable
         await SetSpotifyPlayerListeners( spotifyPlayer , spotifyModule );
         await ConnectSpotifyPlayer( spotifyPlayer , spotifyModule );
         return spotifyPlayer;
-    }
-
-    public void Dispose()
-    {
-        GC.SuppressFinalize( this );
     }
 }

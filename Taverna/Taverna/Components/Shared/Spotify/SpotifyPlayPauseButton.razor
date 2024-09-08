@@ -1,0 +1,58 @@
+@inject IJSRuntime JS
+
+<button class="playing-state-button p-0 @State" @onclick="PlaySpotify">
+    <svg role="img" height="16" width="16" aria-hidden="true" viewBox="0 0 16 16" data-encore-id="icon" class="spotify-pause-icon @(_shouldSetLoadingAnimation ? "d-none" : "")"><path d="M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7H2.7zm8 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-2.6z"></path></svg>
+    <svg role="img" height="16" width="16" aria-hidden="true" viewBox="0 0 16 16" data-encore-id="icon" class="spotify-play-icon @(_shouldSetLoadingAnimation ? "d-none" : "")"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z"></path></svg>
+
+    @if (_shouldSetLoadingAnimation)
+    {
+        <div class="rotate-infinity" style="border-width: 0.3em; border-style: solid; border-color: var(--spotify-green) rgb(243, 243, 243) rgb(243, 243, 243); border-image: initial; border-radius: 50%; width: 2em; height: 2em; display: inline-block;">
+        </div>
+    }
+</button>
+
+
+@code {
+    private bool _shouldSetLoadingAnimation
+    {
+        get
+        {
+            return Loading || IsLocalLoading;
+        }
+    }
+
+    public bool IsLocalLoading { get; set; } = false;
+
+    [Parameter]
+    public required bool Loading { get; set; }
+
+    [Parameter]
+    public required SpotifyPlayer? PlayerComponent{ get; set; }
+
+    [Parameter] 
+    public required string State{ get; set; }
+
+    private IJSObjectReference? spotifyModule;
+
+    protected async Task PlaySpotify()
+    {
+        IsLocalLoading = true;
+        if (spotifyModule is null)
+        {
+            spotifyModule = await JS.InvokeAsync<IJSObjectReference>( "import" , "./spotify.js" );
+        }
+
+        if (PlayerComponent is null)
+        {
+            return;
+        }
+
+        await spotifyModule.InvokeVoidAsync( "play" , PlayerComponent.spotifyPlayer );
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        IsLocalLoading = Loading;
+    }
+}
