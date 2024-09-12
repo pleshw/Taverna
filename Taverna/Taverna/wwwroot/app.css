@@ -1,4 +1,4 @@
-@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
 * img {
 	image-rendering: optimizeQuality !important;
@@ -33,6 +33,42 @@
 	--spotify-green: #1DB954;
 	--spotify-black: #191414;
 }
+
+﻿.bg-spotify-black {
+	background-color: var(--spotify-black);
+}
+
+.bg-spotify-green {
+	background-color: var(--spotify-green);
+}
+
+﻿.bg-spotify {
+	background-color: var(--spotify-green);
+}
+
+.btn-spotify img {
+	max-width: 40px;
+}
+
+.btn-spotify {
+	width: 260px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background-color: var(--spotify-green);
+	flex-wrap: wrap;
+	font-size: 1rem;
+	font-weight: bolder;
+	font-family: sans-serif !important;
+}
+
+	.btn-spotify:active {
+		background-color: var(--spotify-green) !important;
+	}
+
+	.btn-spotify:focus {
+		background-color: var(--spotify-green) !important;
+	}
 
 .text-spotify-green {
 	color: var(--spotify-green);

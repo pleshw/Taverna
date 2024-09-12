@@ -11,7 +11,6 @@
         </div>
     </div>
 }
-
 else if (userSpotifyClaim == null || !userSpotifyClaim.IsAuthenticated)
 {
     @if (string.IsNullOrEmpty( AccessToken ))
@@ -144,8 +143,6 @@ else
         }
 
         spotifyPlayer = await spotifyJSInterop.InitSpotifyPlayer( AccessToken , spotifyModule );
-        HttpClient client = ClientFactory.CreateClient();
-        SpotifyPlaybackState? currentState = await client.GetPlayerPlaybackState( AccessToken );
         await InvokeAsync( StateHasChanged );
     }
 
@@ -227,7 +224,21 @@ else
 
         HttpClient client = ClientFactory.CreateClient();
         SpotifyPlaybackState? playbackState = await client.GetPlayerPlaybackState( AccessToken );
-        PlayerCurrentTrack = await client.GetSpotifyTrack( AccessToken , playbackState?.Item?.Id ?? "" );
+
+        if(playbackState is not null)
+        {
+            PlayerCurrentTrack = await client.GetSpotifyTrack( AccessToken , playbackState?.Item?.Id ?? "" );
+            return;
+        }
+
+        SpotifyUserQueue? userQueue = await client.GetCurrentUserQueue( AccessToken );
+
+        if (userQueue == null)
+        {
+            return;
+        }
+
+        PlayerCurrentTrack ??= userQueue.CurrentlyPlaying;
     }
 
     public async Task UpdateSpotifyPlayerState( string trackId )

@@ -29,12 +29,28 @@ public static class SpotifyAPI
                 client);
     }
 
-    public static async Task<SpotifyPlaybackState?> GetPlayerPlaybackState(this HttpClient client, string accessToken)
+    public static async Task<SpotifyPlaybackState?> GetPlayerPlaybackState( this HttpClient client , string accessToken )
     {
         return await Request<SpotifyPlaybackState>(
+                accessToken ,
+                SpotifyRequestURI.GetPlayerPlaybackState ,
+                client );
+    }
+
+    public static async Task<SpotifyUserQueue?> GetCurrentUserQueue( this HttpClient client, string accessToken)
+    {
+        return await Request<SpotifyUserQueue>(
                 accessToken,
-                SpotifyRequestURI.GetPlayerPlaybackState,
+                SpotifyRequestURI.GetCurrentUserQueue,
                 client);
+    }
+
+    public static async Task<SpotifyGenericPlayerResponse?> GetCurrentUserCurrentlyPlaying( this HttpClient client , string accessToken )
+    {
+        return await Request<SpotifyGenericPlayerResponse>(
+                accessToken ,
+                SpotifyRequestURI.GetCurrentUserCurrentlyPlaying ,
+                client );
     }
 
     public static async Task<SpotifyDevice?> GetUserDevices( this HttpClient client , string accessToken )
@@ -141,6 +157,12 @@ public static class SpotifyAPI
         return null;
     }
 
+    /// <summary>
+    /// Adds parameters from json parameters to a web query to proper format, being GET or SET
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="httpMethod"></param>
+    /// <param name="parameters"></param>
     public static void SetQueryParameters(HttpRequestMessage request, HttpMethod httpMethod, JsonDocument parameters)
     {
         if (httpMethod == HttpMethod.Get)
