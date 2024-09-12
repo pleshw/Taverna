@@ -4,7 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Taverna.Wrappers.Spotify;
-using static Taverna.Wrappers.Spotify.SpotifyResponseTypes;
+using static Taverna.Wrappers.Spotify.SpotifyParameterTypes;
 
 namespace Taverna.Scripts.Spotify;
 
@@ -53,6 +53,27 @@ public static class SpotifyAPI
                 client );
     }
 
+    public static async Task<SpotifyUserPlaylistsQuery?> GetUserPlaylists( this HttpClient client , string accessToken, string userId , int limit=40, int offset = 0)
+    {
+        return await Request<SpotifyUserPlaylistsQuery?>(
+                accessToken ,
+                SpotifyRequestURI.GetUserPlaylists.GetEndpointReplaceUserId( userId ) ,
+                client,
+                Parse(new GetResourceWithPagination( limit , offset ) ) );
+    }
+
+    public static async Task<SpotifyUserPlaylistsQuery?> GetCurrentUserPlaylists( this HttpClient client , string accessToken , int limit = 40 , int offset = 0 )
+    {
+        SpotifyUser? user = await client.GetSpotifyCurrentUser(accessToken);
+
+        if (user == null || user.Id == null)
+        {
+            return null;
+        }
+
+        return await client.GetUserPlaylists(accessToken, user.Id, limit , offset);
+    }
+
     public static async Task<SpotifyDevice?> GetUserDevices( this HttpClient client , string accessToken )
     {
         return await Request<SpotifyDevice>(
@@ -68,10 +89,23 @@ public static class SpotifyAPI
             return null;
         }
 
-        SpotifyEndpoint getTrackEndpoint = new($"https://api.spotify.com/v1/tracks/{trackId}", HttpMethod.Get);
         return await Request<SpotifyTrack>(
-                accessToken,
-                getTrackEndpoint,
+                accessToken ,
+                SpotifyRequestURI.GetTrack.GetEndpointReplaceTrackId( trackId ) ,
+                client
+                );
+    }
+
+    public static async Task<SpotifyPlaylist?> GetSpotifyPlaylist( this HttpClient client , string accessToken , string playlistId )
+    {
+        if (string.IsNullOrEmpty( playlistId ))
+        {
+            return null;
+        }
+
+        return await Request<SpotifyPlaylist>(
+                accessToken ,
+                SpotifyRequestURI.GetPlaylist.GetEndpointReplacePlaylistId( playlistId ) ,
                 client
                 );
     }
@@ -171,7 +205,17 @@ public static class SpotifyAPI
             StringBuilder? queryString = new();
             foreach (JsonProperty property in parameters.RootElement.EnumerateObject())
             {
-                queryString.Append($"{property.Name}={property.Value.GetString()}&");
+                switch (property.Value.ValueKind)
+                {
+                    case JsonValueKind.Undefined: throw new NotImplementedException(); 
+                    case JsonValueKind.Object: throw new NotImplementedException(); 
+                    case JsonValueKind.Array: throw new NotImplementedException(); 
+                    case JsonValueKind.String: queryString.Append( $"{property.Name}={property.Value.GetString()}&" ); break;
+                    case JsonValueKind.Number: queryString.Append( $"{property.Name}={property.Value.GetInt32().ToString()}&" ); break;
+                    case JsonValueKind.True: throw new NotImplementedException();
+                    case JsonValueKind.False: throw new NotImplementedException();
+                    case JsonValueKind.Null: throw new NotImplementedException();
+                }
             }
             // Remove the trailing '&' character.
             if (queryString.Length > 0)

@@ -215,6 +215,42 @@ else
         await InvokeAsync( StateHasChanged );
     }
 
+    public async Task<SpotifyUserPlaylistsQuery?> GetUserPlaylistQuery( int limit = 40 , int page = 0 )
+    {
+        if (string.IsNullOrEmpty( AccessToken ))
+        {
+            return null;
+        }
+
+        HttpClient client = ClientFactory.CreateClient();
+        return await client.GetCurrentUserPlaylists( AccessToken , limit , limit * page );
+    }
+
+    public async Task<List<SpotifySimplifiedPlaylist>> GetUserSimplifiedPlaylists( int limit = 40 , int page = 0 )
+    {
+        if (string.IsNullOrEmpty( AccessToken ))
+        {
+            return [];
+        }
+
+        SpotifyUserPlaylistsQuery? userPlaylists = await GetUserPlaylistQuery( limit , page );
+
+        if (userPlaylists == null || userPlaylists.Items == null || userPlaylists.Items.Count < 1)
+        {
+            return [];
+        }
+
+        return userPlaylists.Items.OfType<SpotifySimplifiedPlaylist>().ToList();
+    }
+
+    public async Task<List<string>> GetUserPlaylistIds(int limit = 40, int page = 0)
+    {
+        List<SpotifySimplifiedPlaylist>? userPlaylists = await GetUserSimplifiedPlaylists( limit , page );
+
+
+        return userPlaylists.Select( i => i.Id ).OfType<string>().ToList();
+    }
+
     public async Task UpdatePlayerTrack()
     {
         if (string.IsNullOrEmpty( AccessToken ))
@@ -224,6 +260,8 @@ else
 
         HttpClient client = ClientFactory.CreateClient();
         SpotifyPlaybackState? playbackState = await client.GetPlayerPlaybackState( AccessToken );
+
+        // List<SpotifySimplifiedPlaylist> playlists = await GetUserSimplifiedPlaylists(page: 1);
 
         if(playbackState is not null)
         {
