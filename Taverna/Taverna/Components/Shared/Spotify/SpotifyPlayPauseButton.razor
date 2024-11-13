@@ -13,6 +13,13 @@
 
 
 @code {
+
+
+
+
+
+
+
     private bool _shouldSetLoadingAnimation
     {
         get
@@ -26,28 +33,14 @@
     [Parameter]
     public required bool Loading { get; set; }
 
-    [Parameter]
-    public required SpotifyPlayer? PlayerComponent{ get; set; }
-
     [Parameter] 
-    public required string State{ get; set; }
-
-    private IJSObjectReference? spotifyModule;
+    public required string State { get; set; }
 
     protected async Task PlaySpotify()
     {
         IsLocalLoading = true;
-        if (spotifyModule is null)
-        {
-            spotifyModule = await JS.InvokeAsync<IJSObjectReference>( "import" , "./spotify.js" );
-        }
 
-        if (PlayerComponent is null)
-        {
-            return;
-        }
-
-        await spotifyModule.InvokeVoidAsync( "play" , PlayerComponent.spotifyPlayer );
+        await SpotifyWrapper.SpotifyJSInterop.SpotifyModule.InvokeVoidAsync("play", SpotifyWrapper.SpotifyJSInterop.SpotifyPlayer);
     }
 
     protected override async Task OnParametersSetAsync()

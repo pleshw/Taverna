@@ -11,7 +11,9 @@ WebApplicationBuilder? builder = WebApplication.CreateBuilder( args );
 // Add services to the container.
 builder.Configuration.AddUserSecrets<Program>();
 
-builder.Services.AddRazorComponents()
+builder.Services
+    .AddMemoryCache()
+    .AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
@@ -51,7 +53,7 @@ static void ConfigureServices( IServiceCollection services , IConfiguration conf
     services.AddHttpClient();
     services.AddAuthorizationCore();
     services.AddRazorPages();
-    services.AddServerSideBlazor();
+    services.AddServerSideBlazor().AddCircuitOptions( options => { options.DetailedErrors = true; } );
 
     AddSpotifyServiceAuthentication( services , configuration );
 }

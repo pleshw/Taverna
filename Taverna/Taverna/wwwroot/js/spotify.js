@@ -9,7 +9,7 @@
 export function setSpotifyPlayerListeners(spotifyPlayer) {
     spotifyPlayer.addListener('ready', ({ device_id }) => {
         DotNet.invokeMethodAsync('Taverna', 'SetSpotifyDeviceId', device_id);
-        DotNet.invokeMethodAsync('Taverna', 'SetSpotifyLastPlayed', device_id);
+        //DotNet.invokeMethodAsync('Taverna', 'SetSpotifyLastPlayed', device_id);
     });
 
     spotifyPlayer.addListener('not_ready', ({ device_id }) => {
@@ -45,7 +45,7 @@ export function setSpotifyPlayerListeners(spotifyPlayer) {
     }));
 }
 
-export function getCurrentStateSpotifyPlayer(spotifyPlayer) {
+export function updateStateSpotifyPlayer(spotifyPlayer) {
     spotifyPlayer.getCurrentState().then(state => {
         DotNet.invokeMethodAsync('Taverna', 'SpotifyStateHasChanged', state);
     });
@@ -69,6 +69,7 @@ export function disconnectSpotifyPlayer(spotifyPlayer) {
 
 export function play(spotifyPlayer) {
     DotNet.invokeMethodAsync('Taverna', 'TransferPlaybackToPlayerJS').then(shouldPlay => {
+        console.log(spotifyPlayer, shouldPlay)
         if (shouldPlay) {
             spotifyPlayer.resume();
         } else {

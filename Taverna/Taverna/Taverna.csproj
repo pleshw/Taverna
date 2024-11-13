@@ -10,12 +10,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Components\Shared\MainLayout.razor" />
     <Content Remove="Components\Shared\NavMenu.razor.razor" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Components\Shared\MainLayout.razor.css" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Taverna.Client\Taverna.Client.csproj" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.11" />
   </ItemGroup>
 
   <ItemGroup>
