@@ -13,13 +13,6 @@
 
 
 @code {
-
-
-
-
-
-
-
     private bool _shouldSetLoadingAnimation
     {
         get
@@ -39,7 +32,6 @@
     protected async Task PlaySpotify()
     {
         IsLocalLoading = true;
-
         await SpotifyWrapper.SpotifyJSInterop.SpotifyModule.InvokeVoidAsync("play", SpotifyWrapper.SpotifyJSInterop.SpotifyPlayer);
     }
 

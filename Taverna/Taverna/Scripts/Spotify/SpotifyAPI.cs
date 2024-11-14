@@ -173,7 +173,7 @@ public static class SpotifyAPI
         {
             {"grant_type", "client_credentials" },
             {"client_id", "2a581139f71642bebb60f0a2f2540137" },
-            {"client_secret", "af3adfc58555408cb8af716a63365f71" }
+            {"client_secret", "6340635eb58b442b9013e2e15aef1492" }
         };
 
         HttpRequestMessage request = new( SpotifyRequestURI.RequestAccessToken.Method , SpotifyRequestURI.RequestAccessToken.URL );

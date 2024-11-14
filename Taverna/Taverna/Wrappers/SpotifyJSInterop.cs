@@ -49,16 +49,10 @@ public class SpotifyJSInterop : IAsyncDisposable
     {
         GC.SuppressFinalize( this );
 
-        if (SpotifyPlayer is not null)
-        {
-            await DisconnectSpotifyPlayer();
-        }
-
         if (spotifyModule is not null)
         {
             await spotifyModule.DisposeAsync();
             spotifyModule = null;
-            SpotifyPlayer = null;
         }
     }
 }
