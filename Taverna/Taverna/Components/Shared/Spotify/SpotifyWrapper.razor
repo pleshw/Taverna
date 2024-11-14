@@ -113,7 +113,7 @@ else
         if (string.IsNullOrEmpty(AccessToken) || spotifyModule is null)
         {
             return;
-        }   
+        }
 
         await SpotifyJSInterop.InitSpotifyPlayer(AccessToken, spotifyModule);
     }
@@ -275,8 +275,10 @@ else
         }
     }
 
-    public async ValueTask DisposeAsync(){
-        if(spotifyJSInterop is not null)
+    public async ValueTask DisposeAsync()
+    {
+        GC.SuppressFinalize(this);
+        if (spotifyJSInterop is not null)
         {
             await spotifyJSInterop.DisposeAsync();
         }

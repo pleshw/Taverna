@@ -19,75 +19,46 @@ public class SpotifyJSInterop : IAsyncDisposable
 
     public async Task<IJSObjectReference> CreateSpotifyPlayer( string accessToken )
     {
-        if (SpotifyModule is null)
-        {
-            throw new( nameof( SpotifyModule ) );
-        }
-
         return await SpotifyModule.InvokeAsync<IJSObjectReference>( "createSpotifyPlayer" , accessToken );
-    }
-
-    public async Task SetSpotifyPlayerListeners( )
-    {
-        if (SpotifyModule is null || SpotifyPlayer is null)
-        {
-            throw new( nameof( SpotifyModule ) );
-        }
-
-        await SpotifyModule.InvokeVoidAsync( "setSpotifyPlayerListeners" , SpotifyPlayer );
     }
 
     public async Task DisconnectSpotifyPlayer()
     {
-        if (SpotifyModule is null || SpotifyPlayer is null)
-        {
-            throw new( nameof( SpotifyModule ) );
-        }
-
-        await SpotifyModule.InvokeVoidAsync( "disconnectSpotifyPlayer" , SpotifyPlayer );
+        await SpotifyModule.InvokeVoidAsync( "disconnectSpotifyPlayer"  );
     }
 
     public async Task ConnectSpotifyPlayer( )
     {
-        if (SpotifyModule is null || SpotifyPlayer is null)
-        {
-            throw new( nameof( SpotifyModule ) );
-        }
-
-        await SpotifyModule.InvokeVoidAsync( "connectSpotifyPlayer" , SpotifyPlayer );
+        await SpotifyModule.InvokeVoidAsync( "connectSpotifyPlayer"  );
     }
 
     public async Task<IJSObjectReference?> UpdateStateSpotifyPlayer( string accessToken )
     {
-        if (SpotifyModule is null)
-        {
-            throw new( nameof( SpotifyModule ) );
-        }
-
         return await SpotifyModule.InvokeAsync<IJSObjectReference>( "updateStateSpotifyPlayer" , accessToken );
     }
 
     public async Task<IJSObjectReference?> InitSpotifyPlayer( string accessToken , IJSObjectReference spotifyModule )
     {
         this.spotifyModule = spotifyModule;
-        SpotifyPlayer ??= await CreateSpotifyPlayer( accessToken );
-        await SetSpotifyPlayerListeners();
+        SpotifyPlayer = await CreateSpotifyPlayer( accessToken );
         await ConnectSpotifyPlayer();
         return SpotifyPlayer;
     }
 
     public async ValueTask DisposeAsync()
     {
-        if (SpotifyModule is not null)
-        {
-            await SpotifyModule.DisposeAsync();
-        }
+        GC.SuppressFinalize( this );
 
         if (SpotifyPlayer is not null)
         {
-            await SpotifyPlayer.DisposeAsync();
+            await DisconnectSpotifyPlayer();
         }
 
-        GC.SuppressFinalize( this );
+        if (spotifyModule is not null)
+        {
+            await spotifyModule.DisposeAsync();
+            spotifyModule = null;
+            SpotifyPlayer = null;
+        }
     }
 }

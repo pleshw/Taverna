@@ -37,10 +37,4 @@
 
     [Parameter]
     public required SpotifyTrack PlayerCurrentTrack { get; set; }
-
-
-    protected override async Task OnParametersSetAsync()
-    {
-        await base.OnParametersSetAsync();
-    }
 }
