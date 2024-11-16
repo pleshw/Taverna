@@ -1,4 +1,4 @@
-﻿class SpotifyManager {
+﻿export class SpotifyManager {
     static deviceName = 'CdR - Web App';
     static deviceId;
     static player;

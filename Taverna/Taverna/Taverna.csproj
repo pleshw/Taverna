@@ -10,12 +10,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="Components\Shared\MainLayout.razor" />
     <Content Remove="Components\Shared\NavMenu.razor.razor" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Components\Shared\MainLayout.razor.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Components\Shared\Spotify\SpotifyWrapper.razor.js" />
   </ItemGroup>
 
   <ItemGroup>

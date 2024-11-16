@@ -5,6 +5,7 @@ namespace Taverna.Wrappers;
 
 public class SpotifyJSInterop : IAsyncDisposable
 {
+    private readonly IJSRuntime _jsRuntime;
 
     public IJSObjectReference? SpotifyPlayer { get; private set; }
 
@@ -12,9 +13,9 @@ public class SpotifyJSInterop : IAsyncDisposable
     private IJSObjectReference? spotifyModule = null;
     public IJSObjectReference SpotifyModule { get => spotifyModule ?? throw new( "Invalid spotify module" ); }
 
-    public SpotifyJSInterop()
+    public SpotifyJSInterop( IJSRuntime jsRuntime )
     {
-
+        _jsRuntime = jsRuntime;
     }
 
     public async Task<IJSObjectReference> CreateSpotifyPlayer( string accessToken )
@@ -37,10 +38,10 @@ public class SpotifyJSInterop : IAsyncDisposable
         return await SpotifyModule.InvokeAsync<IJSObjectReference>( "updateStateSpotifyPlayer" , accessToken );
     }
 
-    public async Task<IJSObjectReference?> InitSpotifyPlayer( string accessToken , IJSObjectReference spotifyModule )
+    public async Task<IJSObjectReference?> InitSpotifyPlayer( string accessToken )
     {
-        this.spotifyModule = spotifyModule;
-        SpotifyPlayer = await CreateSpotifyPlayer( accessToken );
+        spotifyModule ??= await _jsRuntime.InvokeAsync<IJSObjectReference>( "import" , "./Components/Shared/Spotify/SpotifyWrapper.razor.js" );
+        SpotifyPlayer ??= await CreateSpotifyPlayer( accessToken );
         return SpotifyPlayer;
     }
 
@@ -48,11 +49,9 @@ public class SpotifyJSInterop : IAsyncDisposable
     {
         GC.SuppressFinalize( this );
 
-        if (spotifyModule is not null)
+        if(spotifyModule is not null)
         {
             await spotifyModule.DisposeAsync();
-            SpotifyPlayer = null;
-            spotifyModule = null;
         }
     }
 }

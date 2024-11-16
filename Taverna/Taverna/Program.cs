@@ -4,6 +4,7 @@ using System.Security.Claims;
 using Taverna.Client.Pages;
 using Taverna.Components;
 using Taverna.Scripts.Spotify;
+using Taverna.Wrappers;
 using Taverna.Wrappers.Spotify;
 
 WebApplicationBuilder? builder = WebApplication.CreateBuilder( args );
@@ -62,6 +63,7 @@ static void AddSpotifyServiceAuthentication( IServiceCollection services , IConf
 {
     SpotifyCredentialsProvider? spotifyCredentialsProvider = new( configuration );
     services.AddSingleton( provider => spotifyCredentialsProvider );
+    services.AddScoped<SpotifyJSInterop>();
 
     services.AddAuthentication( options =>
     {

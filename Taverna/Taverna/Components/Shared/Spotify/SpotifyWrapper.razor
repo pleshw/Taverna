@@ -3,16 +3,11 @@
 @inject IJSRuntime JS
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IHttpClientFactory ClientFactory
+@inject SpotifyJSInterop SpotifyJSInterop
 
 @implements IAsyncDisposable
-@if (!Loaded)
-{
-    <div class="row justify-content-center align-content-center w-100 m-0 p-5 rounded-0">
-        <div class="rotate-infinity" style="border-width: 0.3em; border-style: solid; border-color: var(--spotify-green) rgb(243, 243, 243) rgb(243, 243, 243); border-image: initial; border-radius: 50%; width: 2em; height: 2em; display: inline-block;">
-        </div>
-    </div>
-}
-else if (userSpotifyClaim == null || !userSpotifyClaim.IsAuthenticated)
+
+@if (userSpotifyClaim == null || !userSpotifyClaim.IsAuthenticated)
 {
     @if (string.IsNullOrEmpty(AccessToken))
     {
@@ -34,10 +29,7 @@ else
 }
 
 @code {
-    public bool Loaded { get; set; }
     public static string? DeviceId { get; set; }
-    public static SpotifyJSInterop? spotifyJSInterop { get; private set; }
-    public static SpotifyJSInterop SpotifyJSInterop { get => spotifyJSInterop ??= new(); }
     public static SpotifyWebPlaybackState? spotifyWebPlayerState;
     public static string? AccessToken;
     public ClaimsIdentity? userSpotifyClaim;
@@ -66,23 +58,14 @@ else
     {
         await base.OnAfterRenderAsync(firstRender);
 
-
         if (!firstRender)
         {
-            Loaded = true;
             return;
         }
 
-        Loaded = false;
-
         await SpotifyAuthCheck();
-        
-        IJSObjectReference spotifyModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/spotify.js");
-        await InitSpotifyPlayer(spotifyModule);
-        
+        await InitSpotifyPlayer();
         await UpdateSpotifyPlayerState();
-
-        Loaded = true;
         AwaitCommandComplete = false;
     }
 
@@ -105,14 +88,14 @@ else
         AccessToken = authState.User.FindFirst("spotifyAccessToken")?.Value;
     }
 
-    private async Task InitSpotifyPlayer(IJSObjectReference spotifyModule)
+    private async Task InitSpotifyPlayer()
     {
-        if (string.IsNullOrEmpty(AccessToken) || spotifyModule is null)
+        if (string.IsNullOrEmpty(AccessToken))
         {
             return;
         }
 
-        await SpotifyJSInterop.InitSpotifyPlayer(AccessToken, spotifyModule);
+        await SpotifyJSInterop.InitSpotifyPlayer(AccessToken);
     }
 
     [JSInvokable("TransferPlaybackToPlayerJS")]
@@ -274,9 +257,9 @@ else
     {
         GC.SuppressFinalize(this);
 
-        if (spotifyJSInterop is not null)
+        if (SpotifyJSInterop is not null)
         {
-            await spotifyJSInterop.DisposeAsync();
+            await SpotifyJSInterop.DisposeAsync();
         }
     }
 }
