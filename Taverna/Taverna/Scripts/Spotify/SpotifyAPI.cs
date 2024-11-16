@@ -74,9 +74,9 @@ public static class SpotifyAPI
         return await client.GetUserPlaylists(accessToken, user.Id, limit , offset);
     }
 
-    public static async Task<SpotifyDevice?> GetUserDevices( this HttpClient client , string accessToken )
+    public static async Task<SpotifyAvailableDevices?> GetUserDevices( this HttpClient client , string accessToken )
     {
-        return await Request<SpotifyDevice>(
+        return await Request<SpotifyAvailableDevices>(
                 accessToken ,
                 SpotifyRequestURI.GetDevices,
                 client );

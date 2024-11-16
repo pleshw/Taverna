@@ -41,7 +41,6 @@ public class SpotifyJSInterop : IAsyncDisposable
     {
         this.spotifyModule = spotifyModule;
         SpotifyPlayer = await CreateSpotifyPlayer( accessToken );
-        await ConnectSpotifyPlayer();
         return SpotifyPlayer;
     }
 
@@ -52,6 +51,7 @@ public class SpotifyJSInterop : IAsyncDisposable
         if (spotifyModule is not null)
         {
             await spotifyModule.DisposeAsync();
+            SpotifyPlayer = null;
             spotifyModule = null;
         }
     }

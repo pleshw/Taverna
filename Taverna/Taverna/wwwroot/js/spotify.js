@@ -4,7 +4,7 @@
     static player;
 
     static async getPlayer(accessToken) {
-        if (SpotifyManager.player) {
+        if (!accessToken || SpotifyManager.player) {
             return SpotifyManager.player;
         }
 
@@ -14,8 +14,10 @@
             volume: 1
         });
 
-        await SpotifyManager.setPlayerListeners();
+        SpotifyManager.player.isConnected = false;
 
+        await SpotifyManager.setPlayerListeners();
+        await connectSpotifyPlayer();
         return SpotifyManager.player;
     }
 
@@ -30,7 +32,6 @@
         });
 
         SpotifyManager.player.addListener('initialization_error', ({ message }) => {
-            debugger
             console.error(message);
         });
 
@@ -69,7 +70,6 @@ export async function createSpotifyPlayer(accessToken) {
 
 export async function updateStateSpotifyPlayer() {
     const currentPlayer = await SpotifyManager.getPlayer();
-
     const playerState = await DOMTools.handlePromiseWithTimeout(currentPlayer.getCurrentState());
 
     DotNet.invokeMethodAsync('Taverna', 'SpotifyStateHasChanged', playerState);
@@ -87,6 +87,7 @@ export async function connectSpotifyPlayer() {
     const responseSuccess = connectResponse.data();
 
     if (responseSuccess) {
+        currentPlayer.isConnected = true;
         console.log('Você está conectado ao Spotify!');
     } else {
         console.warn('Falha ao conectar ao Spotify, atualize a página e tente novamente.');
@@ -104,12 +105,7 @@ export async function disconnectSpotifyPlayer() {
 
 export async function play() {
     const currentPlayer = await SpotifyManager.getPlayer();
-    var playerState = await DOMTools.handlePromiseWithTimeout(currentPlayer.getCurrentState());
-
-    if (playerState === null) {
-        await connectSpotifyPlayer();
-    }
-
+    
     DotNet.invokeMethodAsync('Taverna', 'TransferPlaybackToPlayerJS', SpotifyManager.deviceName).then(async shouldPlay => {
         if (shouldPlay) {
             await currentPlayer.resume();
