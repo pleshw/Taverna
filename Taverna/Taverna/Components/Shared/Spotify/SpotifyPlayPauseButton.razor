@@ -27,13 +27,31 @@
     [Parameter]
     public required bool Loading { get; set; }
 
-    [Parameter] 
+    [Parameter]
     public required string State { get; set; }
+
+    [Parameter]
+    public required SpotifyWrapper? SpotifyWrapperComponent { get; set; }
+
+    private IJSObjectReference? SpotifyModule;
 
     protected async Task PlaySpotify()
     {
         IsLocalLoading = true;
-        await SpotifyJSInterop.SpotifyModule.InvokeVoidAsync("play", SpotifyJSInterop.SpotifyPlayer);
+        if (SpotifyModule is null)
+        {
+            SpotifyModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/spotify.js");
+        }
+
+        if (SpotifyWrapperComponent is null)
+        {
+            return;
+        }
+
+        if (SpotifyJSInterop.SpotifyModule is not null)
+        {
+            await SpotifyModule.InvokeVoidAsync("play", SpotifyWrapperComponent.SpotifyPlayerObject);
+        }
     }
 
     protected override async Task OnParametersSetAsync()

@@ -3,55 +3,48 @@ using Taverna.Components.Shared.Spotify;
 
 namespace Taverna.Wrappers;
 
-public class SpotifyJSInterop : IAsyncDisposable
+public class SpotifyJSInterop
 {
-    private readonly IJSRuntime _jsRuntime;
-
+    public IJSObjectReference? SpotifyModule { get; private set; }
     public IJSObjectReference? SpotifyPlayer { get; private set; }
 
-
-    private IJSObjectReference? spotifyModule = null;
-    public IJSObjectReference SpotifyModule { get => spotifyModule ?? throw new( "Invalid spotify module" ); }
-
-    public SpotifyJSInterop( IJSRuntime jsRuntime )
+    public SpotifyJSInterop(  )
     {
-        _jsRuntime = jsRuntime;
+
     }
 
-    public async Task<IJSObjectReference> CreateSpotifyPlayer( string accessToken )
+    public async Task<IJSObjectReference> CreateSpotifyPlayer( string accessToken , IJSObjectReference spotifyModule )
     {
-        return await SpotifyModule.InvokeAsync<IJSObjectReference>( "createSpotifyPlayer" , accessToken );
+        return await spotifyModule.InvokeAsync<IJSObjectReference>( "createSpotifyPlayer" , accessToken );
     }
 
-    public async Task DisconnectSpotifyPlayer()
+    public async Task<IJSObjectReference?> UpdateStateSpotifyPlayer( string accessToken , IJSObjectReference spotifyModule )
     {
-        await SpotifyModule.InvokeVoidAsync( "disconnectSpotifyPlayer"  );
+        return await spotifyModule.InvokeAsync<IJSObjectReference>( "updateStateSpotifyPlayer" , accessToken );
     }
 
-    public async Task ConnectSpotifyPlayer( )
+    public async Task SetSpotifyPlayerListeners( IJSObjectReference spotifyModule, IJSObjectReference spotifyPlayer )
     {
-        await SpotifyModule.InvokeVoidAsync( "connectSpotifyPlayer"  );
+        await spotifyModule.InvokeVoidAsync( "setSpotifyPlayerListeners" , spotifyPlayer );
     }
 
-    public async Task<IJSObjectReference?> UpdateStateSpotifyPlayer( string accessToken )
+    public async Task DisconnectSpotifyPlayer( IJSObjectReference spotifyModule , IJSObjectReference spotifyPlayer )
     {
-        return await SpotifyModule.InvokeAsync<IJSObjectReference>( "updateStateSpotifyPlayer" , accessToken );
+        await spotifyModule.InvokeVoidAsync( "disconnectSpotifyPlayer" , spotifyPlayer );
     }
 
-    public async Task<IJSObjectReference?> InitSpotifyPlayer( string accessToken )
+    public async Task ConnectSpotifyPlayer( IJSObjectReference spotifyModule , IJSObjectReference spotifyPlayer )
     {
-        spotifyModule ??= await _jsRuntime.InvokeAsync<IJSObjectReference>( "import" , "./Components/Shared/Spotify/SpotifyWrapper.razor.js" );
-        SpotifyPlayer ??= await CreateSpotifyPlayer( accessToken );
+        await spotifyModule.InvokeVoidAsync( "connectSpotifyPlayer" , spotifyPlayer );
+    }
+
+
+    public async Task<IJSObjectReference?> InitSpotifyPlayer( string accessToken, IJSObjectReference spotifyModule )
+    {
+        SpotifyModule = spotifyModule;
+        SpotifyPlayer = await CreateSpotifyPlayer( accessToken, spotifyModule );
+        await ConnectSpotifyPlayer( spotifyModule, SpotifyPlayer );
+        await SetSpotifyPlayerListeners( spotifyModule , SpotifyPlayer );
         return SpotifyPlayer;
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        GC.SuppressFinalize( this );
-
-        if(spotifyModule is not null)
-        {
-            await spotifyModule.DisposeAsync();
-        }
     }
 }

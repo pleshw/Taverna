@@ -18,7 +18,7 @@
     </div>
     <div class="row col-2 justify-content-start align-items-center">
         <div class="row col-12 justify-content-center">
-            <SpotifyPlayPauseButton Loading="Loading" State="@(IsPlaying ? "playing" : "")"></SpotifyPlayPauseButton>
+            <SpotifyPlayPauseButton SpotifyWrapperComponent="SpotifyWrapperComponent" Loading="Loading" State="@(IsPlaying ? "playing" : "")"></SpotifyPlayPauseButton>
         </div>
     </div>
 </div>
@@ -37,4 +37,7 @@
 
     [Parameter]
     public required SpotifyTrack PlayerCurrentTrack { get; set; }
+
+    [Parameter]
+    public required SpotifyWrapper? SpotifyWrapperComponent { get; set; }
 }
