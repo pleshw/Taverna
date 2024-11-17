@@ -18,6 +18,7 @@
 
         await SpotifyManager.setPlayerListeners();
         await connectSpotifyPlayer();
+
         return SpotifyManager.player;
     }
 
